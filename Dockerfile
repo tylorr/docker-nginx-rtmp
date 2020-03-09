@@ -5,9 +5,12 @@ ARG FFMPEG_VERSION=4.2.1
 
 ##############################
 # Build the NGINX-build image.
-FROM alpine:3.8 as build-nginx
+FROM alpine:3.11 as build-nginx
 ARG NGINX_VERSION
 ARG NGINX_RTMP_VERSION
+
+# ENV CC=gcc-6.4
+ENV CFLAGS=-Werror
 
 # Build dependencies.
 RUN apk add --update \
@@ -53,7 +56,7 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
 
 ###############################
 # Build the FFmpeg-build image.
-FROM alpine:3.8 as build-ffmpeg
+FROM alpine:3.11 as build-ffmpeg
 ARG FFMPEG_VERSION
 ARG PREFIX=/usr/local
 ARG MAKEFLAGS="-j4"
@@ -72,6 +75,8 @@ RUN apk add --update \
   libwebp-dev \
   libtheora-dev \
   opus-dev \
+  openssl \
+  openssl-dev \
   pkgconf \
   pkgconfig \
   rtmpdump-dev \
@@ -122,7 +127,7 @@ RUN rm -rf /var/cache/* /tmp/*
 
 ##########################
 # Build the release image.
-FROM alpine:3.8
+FROM alpine:3.11
 LABEL MAINTAINER Alfred Gutierrez <alf.g.jr@gmail.com>
 
 RUN apk add --update \
